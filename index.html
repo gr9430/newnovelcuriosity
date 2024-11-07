@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>So You're Curious About the New Novel</title>
+    <style>
+        body {
+            font-family: Georgia, serif;
+            background-color: #f5f5dc; /* Cream background */
+            color: #000000; /* Black text */
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+        }
+        #content {
+            max-width: 1000px;
+            width: 100%;
+        }
+        .book-container {
+            background-color: #ffffff;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
+            padding: 20px;
+        }
+        .book-title {
+            font-weight: bold;
+            font-size: 1.2em;
+            margin-bottom: 10px;
+        }
+        .rating-options label {
+            margin-right: 10px;
+        }
+        #submit-button, #more-books-button, #proceed-button {
+            margin-top: 20px;
+            padding: 10px 20px;
+            font-size: 1em;
+            cursor: pointer;
+            background-color: #000000;
+            color: #ffffff;
+            border: none;
+            border-radius: 4px;
+        }
+        #submit-button:hover, #more-books-button:hover, #proceed-button:hover {
+            background-color: #333333;
+        }
+        #progress-bar-container {
+            width: 100%;
+            background-color: #ddd;
+            border-radius: 8px;
+            margin-top: 20px;
+        }
+        #progress-bar {
+            width: 0%;
+            height: 20px;
+            background-color: #4caf50;
+            border-radius: 8px;
+            text-align: center;
+            color: white;
+        }
+        #recommendation {
+            margin-top: 40px;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div id="content">
+        <h1>So You're Curious About the New Novel</h1>
+        <div id="book-list"></div>
+        <div id="progress-bar-container">
+            <div id="progress-bar">0%</div>
+        </div>
+        <button id="submit-button">Submit Ratings</button>
+        <button id="more-books-button" style="display:none;">Rate More Books</button>
+        <button id="proceed-button" style="display:none;">Proceed with Recommendations</button>
+        <div id="rating-summary" style="margin-top: 20px; font-weight: bold;"></div>
+        <div id="top-genres" style="margin-top: 20px; font-weight: bold;"></div>
+        <div id="recommendation"></div>
+    </div>
+
+    <script>
+               // JSON Data Input
+        const jsonData = {
+            "Proto_New_Novel_Precursors_to_the_Movement_Before_1948": [
+                { "title": "The Life and Opinions of Tristram Shandy, Gentleman", "author": "Laurence Sterne", "year": "1759-1767", "country": "UK", "description": "A pioneering work of metafiction and narrative experimentation that influenced later literary movements." },
+                { "title": "Swann's Way", "author": "Marcel Proust", "year": 1913, "country": "France", "description": "The beginning of Proust's exploration of memory and consciousness, serving as an inspiration for the introspective style of the New Novel." },
+                { "title": "Ulysses", "author": "James Joyce", "year": 1922, "country": "Ireland", "description": "A seminal modernist novel, featuring stream of consciousness and narrative experimentation." },
+                { "title": "To the Lighthouse", "author": "Virginia Woolf", "year": 1927, "country": "UK", "description": "A highly introspective work that influenced the interior focus of the New Novel." },
+                { "title": "The Sound and the Fury", "author": "William Faulkner", "year": 1929, "country": "USA", "description": "A multi-perspective narrative focused on fragmented time and unreliable narrators." },
+                { "title": "The Man Without Qualities", "author": "Robert Musil", "year": "1930-1943", "country": "Austria", "description": "An unfinished work that uses introspection and a fragmented narrative to explore societal decline." },
+                { "title": "The Waves", "author": "Virginia Woolf", "year": 1931, "country": "UK", "description": "An experimental narrative structure focusing on six characters’ inner voices over time." },
+                { "title": "Man's Fate", "author": "André Malraux", "year": 1933, "country": "France", "description": "A philosophical novel with a disjointed narrative that reflects early existentialism." },
+                { "title": "Nausea", "author": "Jean-Paul Sartre", "year": 1938, "country": "France", "description": "A novel that questions reality and consciousness, prefiguring the existential themes of the New Novel." },
+                { "title": "Tropisms", "author": "Nathalie Sarraute", "year": 1939, "country": "France", "description": "A series of vignettes capturing fleeting psychological movements." },
+                { "title": "The Stranger", "author": "Albert Camus", "year": 1942, "country": "France", "description": "The detached narrative style helped lay the groundwork for the emotionally neutral tone of the New Novel." },
+                { "title": "Aurélien", "author": "Louis Aragon", "year": 1944, "country": "France", "description": "A psychological romance exploring inner conflicts and fleeting emotions." },
+                { "title": "The Enchanters", "author": "Régine Robin", "year": 1945, "country": "France", "description": "A complex portrayal of emotional entanglement that shifts between multiple points of view." },
+                { "title": "Entre les actes", "author": "Virginia Woolf", "year": 1941, "country": "UK", "description": "An introspective story that foreshadows the New Novel’s focus on fragmented experience." },
+                { "title": "The Plague", "author": "Albert Camus", "year": 1947, "country": "France", "description": "Blends philosophical inquiry with narrative detachment, similar to the New Novel’s themes." }
+            ],
+            "New_Novel_Core_Works_of_the_Movement_1948_1965": {
+                "Key_Authors": [
+                    { "title": "Portrait d’un inconnu", "author": "Nathalie Sarraute", "year": 1948, "country": "France", "description": "A novel that exemplifies Sarraute's focus on the subconscious and psychological realism." },
+                    { "title": "Les Gommes", "author": "Alain Robbe-Grillet", "year": 1953, "country": "France", "description": "A detective story that challenges traditional narrative structure and causality." },
+                    { "title": "Le Voyeur", "author": "Alain Robbe-Grillet", "year": 1955, "country": "France", "description": "Features a detached examination of human behavior and perception." },
+                    { "title": "La Jalousie", "author": "Alain Robbe-Grillet", "year": 1957, "country": "France", "description": "An intensely descriptive work emphasizing the breakdown of traditional storytelling." },
+                    { "title": "L'Herbe", "author": "Claude Simon", "year": 1958, "country": "France", "description": "Combines flashbacks and stream-of-consciousness techniques to reflect on memory." },
+                    { "title": "Doubles Reflux", "author": "Claude Simon", "year": 1958, "country": "France", "description": "A non-linear narrative focusing on subjective experiences and memory." },
+                    { "title": "Le Planétarium", "author": "Nathalie Sarraute", "year": 1959, "country": "France", "description": "Explores the microcosms of the mind through fragmented narrative techniques." },
+                    { "title": "Dans le labyrinthe", "author": "Alain Robbe-Grillet", "year": 1959, "country": "France", "description": "Examines fragmented reality and time through a non-linear narrative." },
+                    { "title": "The Flanders Road", "author": "Claude Simon", "year": 1960, "country": "France", "description": "Uses shifting perspectives and non-linear time to recount war." }
+                ],
+                "Other_Authors_Aligning_with_the_Movement": [
+                    { "title": "Malone Dies", "author": "Samuel Beckett", "year": 1951, "country": "Ireland", "description": "Part of Beckett’s trilogy, the narrative dissects subjectivity and pushes linguistic minimalism." },
+                    { "title": "L'Emploi du temps", "author": "Michel Butor", "year": 1956, "country": "France", "description": "Centers on dislocated time and subjective perception." },
+                    { "title": "La Modification", "author": "Michel Butor", "year": 1957, "country": "France", "description": "An introspective monologue told in the second person." },
+                    { "title": "Moderato Cantabile", "author": "Marguerite Duras", "year": 1958, "country": "France", "description": "A story that deconstructs language and conventional romance." },
+                    { "title": "Des Forêts", "author": "Claude Ollier", "year": 1960, "country": "France", "description": "Examines shifting landscapes of the mind with a focus on descriptive intensity." },
+                    { "title": "L'Inquisitoire", "author": "Robert Pinget", "year": 1962, "country": "France", "description": "A question-and-answer narrative exploring hidden depths of the human psyche." },
+                    { "title": "Pour un Nouveau Roman", "author": "Alain Robbe-Grillet", "year": 1963, "country": "France", "description": "A manifesto outlining the theoretical underpinnings of the New Novel." },
+                    { "title": "La Maison de rendez-vous", "author": "Alain Robbe-Grillet", "year": 1965, "country": "France", "description": "A cryptic story where setting takes precedence over plot." },
+                    { "title": "Les Choses", "author": "Georges Perec", "year": 1965, "country": "France", "description": "A critique of consumer culture told in detached, observational prose." },
+                    { "title": "Le Condottiere", "author": "Georges Perec", "year": 2012, "country": "France", "description": "Examines an art forger’s inner conflicts through a fragmented narrative." }
+                ]
+            },
+            "Post_New_Novel_Influenced_by_the_Movement_1966_Present": [
+                { "title": "Histoire", "author": "Claude Simon", "year": 1967, "country": "France", "description": "A poetic dissection of memory and history with fragmented storytelling." },
+                { "title": "Tombeau pour cinq cent mille soldats", "author": "Pierre Guyotat", "year": 1967, "country": "France", "description": "A brutal, fragmented story emphasizing the absurdity of war." },
+                { "title": "Une Femme douce", "author": "Georges Simenon", "year": 1969, "country": "Belgium", "description": "An examination of a woman’s inner life before her suicide." },
+                { "title": "Projet pour une révolution à New York", "author": "Alain Robbe-Grillet", "year": 1970, "country": "France", "description": "An experimental narrative intertwining erotica and surreal imagery." },
+                { "title": "India Song", "author": "Marguerite Duras", "year": 1973, "country": "France", "description": "A narrative with overlapping voices, reflecting on the distance between past and present." },
+                { "title": "Rue des Boutiques Obscures", "author": "Patrick Modiano", "year": 1978, "country": "France", "description": "A detective story that explores memory and identity in a dreamlike narrative." },
+                { "title": "La Vie mode d'emploi", "author": "Georges Perec", "year": 1978, "country": "France", "description": "A novel structured like a puzzle, reflecting on how narratives intertwine and build." },
+                { "title": "The Book of Disquiet", "author": "Fernando Pessoa", "year": 1982, "country": "Portugal", "description": "A fragmented collection of reflections on identity and existence." },
+                { "title": "L'Amant", "author": "Marguerite Duras", "year": 1984, "country": "France", "description": "A quasi-autobiographical story that breaks with linear storytelling." },
+                { "title": "White Noise", "author": "Don DeLillo", "year": 1985, "country": "USA", "description": "Examines consumer culture and language with a detached, postmodern sensibility." }
+            ]
+        };
+
+        let ratedBooksCount = 0;
+        let totalBooksRated = 0;
+        let genreRatings = {
+            "Proto-New Novel": 0,
+            "New Novel Core Works": 0,
+            "Post-New Novel": 0
+        };
+        let topAuthors = [];
+        let displayedBooks = [];
+        let allRatedBooks = new Set();
+
+        // Function to get random books excluding already rated books
+        function getRandomBooks(jsonData, count) {
+            const books = [
+                ...jsonData.Proto_New_Novel_Precursors_to_the_Movement_Before_1948.map(book => ({ ...book, genre: "Proto-New Novel" })),
+                ...jsonData.New_Novel_Core_Works_of_the_Movement_1948_1965.Key_Authors.map(book => ({ ...book, genre: "New Novel Core Works" })),
+                ...jsonData.New_Novel_Core_Works_of_the_Movement_1948_1965.Other_Authors_Aligning_with_the_Movement.map(book => ({ ...book, genre: "New Novel Core Works" })),
+                ...jsonData.Post_New_Novel_Influenced_by_the_Movement_1966_Present.map(book => ({ ...book, genre: "Post-New Novel" }))
+            ].filter(book => !allRatedBooks.has(book.title));
+            return books.sort(() => 0.5 - Math.random()).slice(0, count);
+        }
+
+        // Function to display books with rating options
+        function displayBooks(books) {
+            const bookList = document.getElementById("book-list");
+            bookList.innerHTML = "";
+            books.forEach((book, index) => {
+                const bookContainer = document.createElement("div");
+                bookContainer.className = "book-container";
+
+                const bookTitle = document.createElement("div");
+                bookTitle.className = "book-title";
+                bookTitle.textContent = `${book.title} by ${book.author} (${book.year}, ${book.country})`;
+
+                const bookDescription = document.createElement("div");
+                bookDescription.textContent = book.description;
+
+                const ratingOptions = document.createElement("div");
+                ratingOptions.className = "rating-options";
+                [1, 2, 3, 4, 5].forEach(rating => {
+                    const label = document.createElement("label");
+                    const input = document.createElement("input");
+                    input.type = "radio";
+                    input.name = `rating-${index}`;
+                    input.value = rating;
+                    label.appendChild(input);
+                    label.appendChild(document.createTextNode(rating));
+                    ratingOptions.appendChild(label);
+                });
+                const notReadLabel = document.createElement("label");
+                const notReadInput = document.createElement("input");
+                notReadInput.type = "radio";
+                notReadInput.name = `rating-${index}`;
+                notReadInput.value = "not-read";
+                notReadLabel.appendChild(notReadInput);
+                notReadLabel.appendChild(document.createTextNode("Haven't read it"));
+                ratingOptions.appendChild(notReadLabel);
+
+                bookContainer.appendChild(bookTitle);
+                bookContainer.appendChild(bookDescription);
+                bookContainer.appendChild(ratingOptions);
+                bookList.appendChild(bookContainer);
+            });
+        }
+
+        // Function to handle ratings submission
+        function handleRatingsSubmission() {
+            const ratings = document.querySelectorAll("input[type='radio']:checked");
+            ratedBooksCount = 0;
+            const authorRatings = {};
+
+            ratings.forEach(rating => {
+                if (rating.value !== "not-read") {
+                    ratedBooksCount++;
+                    const bookIndex = parseInt(rating.name.split("-")[1]);
+                    const book = displayedBooks[bookIndex];
+                    const genre = book.genre;
+                    const author = book.author;
+
+                    allRatedBooks.add(book.title);
+
+                    if (parseInt(rating.value) >= 3) {
+                        genreRatings[genre]++;
+                        authorRatings[author] = (authorRatings[author] || 0) + 1;
+                    }
+                }
+            });
+
+            totalBooksRated += ratedBooksCount;
+            topAuthors = Object.entries(authorRatings).sort((a, b) => b[1] - a[1]).slice(0, 3).map(([author]) => author);
+
+            updateProgressBar();
+            displayRatingSummary();
+            displayTopGenres();
+            toggleButtons();
+        }
+
+        // Function to update progress bar
+        function updateProgressBar() {
+            const progressBar = document.getElementById("progress-bar");
+            const progressPercentage = (totalBooksRated / 20) * 100;
+            progressBar.style.width = `${progressPercentage}%`;
+            progressBar.textContent = `${Math.min(progressPercentage, 100)}%`;
+        }
+
+        // Function to display rating summary
+        function displayRatingSummary() {
+            const ratingSummary = document.getElementById("rating-summary");
+            ratingSummary.textContent = `You have rated ${totalBooksRated} books.`;
+        }
+
+        // Function to display top three genres
+        function displayTopGenres() {
+            const sortedGenres = Object.entries(genreRatings).sort((a, b) => b[1] - a[1]);
+            const topGenres = sortedGenres.slice(0, 3).map(([genre, count]) => `${genre}: ${count} likes`).join(", ");
+            const topGenresDiv = document.getElementById("top-genres");
+            topGenresDiv.textContent = `Top genres based on your ratings: ${topGenres}`;
+        }
+
+        // Function to display book recommendations based on top authors and genres
+        function displayRecommendations() {
+            const recommendationsDiv = document.getElementById("recommendation");
+            recommendationsDiv.innerHTML = "";
+            if (topAuthors.length > 0) {
+                const topGenres = Object.entries(genreRatings).sort((a, b) => b[1] - a[1]).slice(0, 3).map(([genre]) => genre);
+                const recommendedBooks = [];
+
+                topAuthors.forEach(author => {
+                    const allBooks = [
+                        ...jsonData.Proto_New_Novel_Precursors_to_the_Movement_Before_1948,
+                        ...jsonData.New_Novel_Core_Works_of_the_Movement_1948_1965.Key_Authors,
+                        ...jsonData.New_Novel_Core_Works_of_the_Movement_1948_1965.Other_Authors_Aligning_with_the_Movement,
+                        ...jsonData.Post_New_Novel_Influenced_by_the_Movement_1966_Present
+                    ];
+                    const authorBooks = allBooks.filter(book => book.author === author && !allRatedBooks.has(book.title) && topGenres.includes(book.genre));
+                    if (authorBooks.length > 0) {
+                        recommendedBooks.push(authorBooks[0]);
+                    }
+                });
+
+                if (recommendedBooks.length > 0) {
+                    recommendationsDiv.textContent = "Recommended books based on your top-rated authors and genres:";
+                    recommendedBooks.forEach(book => {
+                        const bookContainer = document.createElement("div");
+                        bookContainer.className = "book-container";
+                        bookContainer.textContent = `${book.title} by ${book.author} (${book.year}, ${book.country})`;
+                        recommendationsDiv.appendChild(bookContainer);
+                    });
+                }
+            } else {
+                recommendationsDiv.textContent = "No recommendations available. Please rate more books.";
+            }
+        }
+
+        // Function to toggle buttons after rating submission
+        function toggleButtons() {
+            document.getElementById("submit-button").style.display = "none";
+            document.getElementById("more-books-button").style.display = "inline-block";
+            document.getElementById("proceed-button").style.display = "inline-block";
+        }
+
+        // Function to handle rating more books
+        function handleMoreBooks() {
+            displayedBooks = getRandomBooks(jsonData, 10);
+            displayBooks(displayedBooks);
+            document.getElementById("submit-button").style.display = "inline-block";
+            document.getElementById("more-books-button").style.display = "none";
+            document.getElementById("proceed-button").style.display = "none";
+        }
+
+        // Get initial 10 random books and display them
+        displayedBooks = getRandomBooks(jsonData, 10);
+        displayBooks(displayedBooks);
+
+        // Add event listeners to buttons
+        document.getElementById("submit-button").addEventListener("click", handleRatingsSubmission);
+        document.getElementById("more-books-button").addEventListener("click", handleMoreBooks);
+        document.getElementById("proceed-button").addEventListener("click", displayRecommendations);
+    </script>
+</body>
+</html>
