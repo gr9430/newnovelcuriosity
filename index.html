@@ -228,10 +228,10 @@
         const recommendationsDiv = document.getElementById("recommendation");
         recommendationsDiv.innerHTML = "";
 
-        if (topAuthors.length > 0 && topGenres.length > 0) {
-            const recommendedBooks = [];
+        let recommendedBooks = [];
 
-            // Recommend books from top authors and top genres that haven't been rated yet
+        // Recommend books from top authors and top genres that haven't been rated yet
+        if (topAuthors.length > 0 && topGenres.length > 0) {
             topAuthors.forEach(author => {
                 const allBooks = [
                     ...jsonData.Proto_New_Novel_Precursors_to_the_Movement_Before_1948,
@@ -242,22 +242,49 @@
                 const authorBooks = allBooks.filter(book => 
                     book.author === author && !allRatedBooks.has(book.title) && topGenres.includes(book.genre)
                 );
-                if (authorBooks.length > 0) {
-                    recommendedBooks.push(authorBooks[0]);
-                }
+                recommendedBooks.push(...authorBooks);
+            });
+        }
+
+        // Fallback: If no books found matching both authors and genres, try matching either top authors or genres
+        if (recommendedBooks.length === 0) {
+            topAuthors.forEach(author => {
+                const allBooks = [
+                    ...jsonData.Proto_New_Novel_Precursors_to_the_Movement_Before_1948,
+                    ...jsonData.New_Novel_Core_Works_of_the_Movement_1948_1965.Key_Authors,
+                    ...jsonData.New_Novel_Core_Works_of_the_Movement_1948_1965.Other_Authors_Aligning_with_the_Movement,
+                    ...jsonData.Post_New_Novel_Influenced_by_the_Movement_1966_Present
+                ];
+                const authorBooks = allBooks.filter(book => book.author === author && !allRatedBooks.has(book.title));
+                recommendedBooks.push(...authorBooks);
             });
 
-            if (recommendedBooks.length > 0) {
-                recommendationsDiv.textContent = "Recommended books based on your top-rated authors and genres:";
-                recommendedBooks.forEach(book => {
-                    const bookContainer = document.createElement("div");
-                    bookContainer.className = "book-container";
-                    bookContainer.textContent = `${book.title} by ${book.author} (${book.year}, ${book.country})`;
-                    recommendationsDiv.appendChild(bookContainer);
+            // If still no books, match by top genres alone
+            if (recommendedBooks.length === 0) {
+                topGenres.forEach(genre => {
+                    const allBooks = [
+                        ...jsonData.Proto_New_Novel_Precursors_to_the_Movement_Before_1948,
+                        ...jsonData.New_Novel_Core_Works_of_the_Movement_1948_1965.Key_Authors,
+                        ...jsonData.New_Novel_Core_Works_of_the_Movement_1948_1965.Other_Authors_Aligning_with_the_Movement,
+                        ...jsonData.Post_New_Novel_Influenced_by_the_Movement_1966_Present
+                    ];
+                    const genreBooks = allBooks.filter(book => book.genre === genre && !allRatedBooks.has(book.title));
+                    recommendedBooks.push(...genreBooks);
                 });
-            } else {
-                recommendationsDiv.textContent = "No recommendations available. Please rate more books.";
             }
+        }
+
+        // Remove duplicates from the recommended books
+        recommendedBooks = [...new Set(recommendedBooks)];
+
+        if (recommendedBooks.length > 0) {
+            recommendationsDiv.textContent = "Recommended books based on your top-rated authors and genres:";
+            recommendedBooks.slice(0, 3).forEach(book => {  // Limit to 3 recommendations
+                const bookContainer = document.createElement("div");
+                bookContainer.className = "book-container";
+                bookContainer.textContent = `${book.title} by ${book.author} (${book.year}, ${book.country})`;
+                recommendationsDiv.appendChild(bookContainer);
+            });
         } else {
             recommendationsDiv.textContent = "No recommendations available. Please rate more books.";
         }
