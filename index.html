@@ -81,6 +81,7 @@
     </div>
 
     <script>
+        let jsonData;
         let ratedBooksCount = 0;
         let totalBooksRated = 0;
         let genreRatings = {
@@ -91,6 +92,25 @@
         let topAuthors = [];
         let displayedBooks = [];
         let allRatedBooks = new Set();
+
+        // Function to fetch JSON data from an external file
+        function fetchJsonData() {
+            fetch('new_novel.json')
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error("Network response was not ok " + response.statusText);
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    jsonData = data;
+                    displayedBooks = getRandomBooks(jsonData, 10);
+                    displayBooks(displayedBooks);
+                })
+                .catch(error => {
+                    console.error("There was a problem with the fetch operation:", error);
+                });
+        }
 
         // Function to get random books excluding already rated books
         function getRandomBooks(jsonData, count) {
@@ -251,9 +271,8 @@
             document.getElementById("proceed-button").style.display = "none";
         }
 
-        // Get initial 10 random books and display them
-        displayedBooks = getRandomBooks(jsonData, 10);
-        displayBooks(displayedBooks);
+        // Fetch JSON data and initialize page
+        fetchJsonData();
 
         // Add event listeners to buttons
         document.getElementById("submit-button").addEventListener("click", handleRatingsSubmission);
